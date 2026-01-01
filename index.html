@@ -362,52 +362,73 @@
         </div>
     </div>
 
-    <div class="absolute top-4 left-4 z-10 bg-slate-900/80 backdrop-blur-md p-5 rounded-xl shadow-2xl border border-slate-700 max-w-sm max-h-[90vh] overflow-y-auto flex flex-col gap-4">
-        <div class="cursor-pointer group" onclick="toggleLegend()">
-            <h1 class="text-xl font-bold text-white mb-1 flex items-center gap-2">
-                European 6G Ecosystem 
-                <svg id="legend-arrow" class="w-4 h-4 text-slate-400 transition-transform group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-            </h1>
-            <p class="text-xs text-slate-400 leading-relaxed mb-3">
-                Funding flows and strategic relationships.
-            </p>
+    <div id="legend" class="absolute top-4 left-4 z-10 bg-slate-900/90 backdrop-blur-md p-5 rounded-xl shadow-2xl border border-slate-700 max-w-sm max-h-[90vh] overflow-y-auto flex flex-col gap-4 transition-all duration-300">
+        
+        <div class="cursor-pointer group flex justify-between items-start" onclick="toggleLegend()">
+            <div>
+                <h1 class="text-xl font-bold text-white mb-1 flex items-center gap-2">
+                    European 6G Ecosystem
+                </h1>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Funding flows & strategic relationships.
+                </p>
+            </div>
+            <div id="legend-arrow" class="text-slate-400 transform transition-transform duration-300 mt-1">▼</div>
         </div>
 
-        <div id="legend-content" class="flex flex-col gap-4 transition-all duration-300 overflow-hidden">
-            <div class="relative">
+        <div id="legend-content" class="flex flex-col gap-4 transition-all duration-300">
+            
+            <div class="relative mt-2">
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <svg class="w-4 h-4 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                    <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 20 20" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
                     </svg>
                 </div>
-                <input type="text" id="search-input" class="block w-full p-2 pl-10 text-sm text-white border border-slate-600 rounded-lg bg-slate-800 focus:ring-blue-500 focus:border-blue-500 placeholder-slate-400" placeholder="Search (e.g. Nokia, Call 1)...">
+                <input type="text" id="search-input" class="block w-full p-2 pl-10 text-sm text-white border border-slate-600 rounded-lg bg-slate-800 focus:ring-blue-500 focus:border-blue-500 placeholder-slate-400" placeholder="Search entity...">
             </div>
             
-            <div class="space-y-2 border-t border-slate-700 pt-4">
+            <div class="space-y-2 border-t border-slate-700 pt-4 text-sm">
                 <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Legend</h3>
-                <div class="legend-item"><div class="legend-color" style="background: #60a5fa;"></div>EU Institution / Governance <span id="count-1" class="count-badge"></span></div>
-                <div class="legend-item"><div class="legend-color" style="background: #34d399;"></div>National Gov / Hub <span id="count-2" class="count-badge"></span></div>
-                <div class="legend-item"><div class="legend-color" style="background: #f87171;"></div>Private Company <span id="count-3" class="count-badge"></span></div>
-                <div class="legend-item"><div class="legend-color" style="background: #c084fc;"></div>Project (Flagship/General) <span id="count-4" class="count-badge"></span></div>
-                <div class="legend-item"><div class="legend-color" style="background: #f472b6;"></div>Funding Calls (Stream) <span id="count-calls" class="count-badge"></span></div>
-                <div class="legend-item"><div class="legend-color" style="background: #fbbf24;"></div>Research / University <span id="count-5" class="count-badge"></span></div>
+                
+                <div class="flex items-center justify-between p-1 hover:bg-white/5 rounded">
+                    <div class="flex items-center"><span class="w-3 h-3 rounded-full mr-2 bg-blue-400 shadow-[0_0_5px_#60a5fa]"></span>Governance</div>
+                    <span id="count-1" class="text-xs font-mono text-slate-500 font-bold"></span>
+                </div>
+
+                <div class="flex items-center justify-between p-1 hover:bg-white/5 rounded">
+                    <div class="flex items-center"><span class="w-3 h-3 rounded-full mr-2 bg-emerald-400 shadow-[0_0_5px_#34d399]"></span>National Hubs</div>
+                    <span id="count-2" class="text-xs font-mono text-slate-500 font-bold"></span>
+                </div>
+
+                <div class="flex items-center justify-between p-1 hover:bg-white/5 rounded">
+                    <div class="flex items-center"><span class="w-3 h-3 rounded-full mr-2 bg-red-400 shadow-[0_0_5px_#f87171]"></span>Corporates</div>
+                    <span id="count-3" class="text-xs font-mono text-slate-500 font-bold"></span>
+                </div>
+
+                <div class="flex items-center justify-between p-1 hover:bg-white/5 rounded">
+                    <div class="flex items-center"><span class="w-3 h-3 rounded-full mr-2 bg-purple-400 shadow-[0_0_5px_#c084fc]"></span>Projects (A,B,C,D)</div>
+                    <span id="count-calls" class="text-xs font-mono text-slate-500 font-bold"></span>
+                </div>
+
+                <div class="flex items-center justify-between p-1 hover:bg-white/5 rounded">
+                    <div class="flex items-center"><span class="w-3 h-3 rounded-full mr-2 bg-amber-400 shadow-[0_0_5px_#fbbf24]"></span>Research / Univ</div>
+                    <span id="count-5" class="text-xs font-mono text-slate-500 font-bold"></span>
+                </div>
             </div>
 
-            <div id="investment-box-trigger" class="total-investment-box">
-                <div class="total-investment-label">Est. Total Investment</div>
-                <div class="total-investment-value">&gt; €3.8 Billion</div>
+            <div id="investment-box-trigger" class="bg-emerald-900/20 border border-emerald-500/30 rounded-lg p-3 text-center cursor-help hover:bg-emerald-900/40 transition-all shadow-[0_0_15px_rgba(16,185,129,0.1)]">
+                <div class="text-[10px] uppercase tracking-wider text-emerald-400 mb-1">Est. Total Investment</div>
+                <div class="text-lg font-extrabold text-white text-shadow-sm">> €3.8 Billion</div>
             </div>
 
-            <p class="text-xs text-slate-400">
-                <span class="text-amber-400 font-semibold mt-1 block border-t border-slate-600 pt-2">Controls:</span>
-                • Click <strong>Circle</strong> to Zoom/Focus.<br>
-                • Click <strong>Name</strong> to Visit Website.
-            </p>
+            <div class="mt-2 text-center border-t border-slate-700 pt-3">
+                <a href="https://stop6g.eu" target="_blank" class="text-xs font-bold tracking-[0.2em] text-slate-500 hover:text-red-500 transition-colors uppercase font-mono">
+                    stop6g.eu
+                </a>
+            </div>
+            
         </div>
     </div>
-
     <div id="tooltip" class="tooltip"></div>
     <div id="graph-container"></div>
 <script>
@@ -415,7 +436,7 @@
     function toggleLegend() {
         const content = document.getElementById('legend-content');
         const arrow = document.getElementById('legend-arrow');
-        
+        // Simple toggle de clases
         if (content.classList.contains('hidden')) {
             content.classList.remove('hidden');
             arrow.style.transform = 'rotate(0deg)';
@@ -427,46 +448,28 @@
 
     window.addEventListener('load', function() {
         
-        console.log("Iniciando carga de datos...");
-
-        // 1. CARGA DE DATOS EXTERNOS
+        // 1. CARGA DE DATOS (CSV)
         Promise.all([
             d3.csv("data/nodes.csv"),
             d3.csv("data/links.csv")
         ]).then(function([rawNodes, rawLinks]) {
 
-            console.log("Archivos cargados. Procesando...");
-            console.log("Ejemplo crudo nodo 0:", rawNodes[0]); // Muestra en consola qué columnas lee realmente
+            // PROCESAMIENTO: Convertir datos de texto (CSV) a tipos útiles
+            const nodes = rawNodes.map(d => ({
+                id: d.id,
+                group: parseInt(d.group, 10) || 1, // Convertir a Numero
+                size: parseInt(d.size, 10) || 10,  // Convertir a Numero
+                label: d.label || d.id,
+                desc: d.desc || "",
+                url: d.url || ""
+            }));
 
-            // --- PROCESAMIENTO ROBUSTO DE DATOS ---
-            
-            // 2. Limpieza y Conversión de Tipos
-            const nodes = rawNodes.map(d => {
-                // Intentamos leer 'group' o 'Group' (por si acaso mayúsculas)
-                let g = d.group || d.Group; 
-                let s = d.size || d.Size;
-
-                return {
-                    id: d.id,
-                    // Convertimos a número entero. Si falla, ponemos grupo 1 por defecto
-                    group: parseInt(g, 10) || 1, 
-                    // Convertimos tamaño. Si falla, tamaño 15 por defecto
-                    size: parseInt(s, 10) || 15,
-                    label: d.label || d.id, // Si no hay label, usa el ID
-                    desc: d.desc || "",
-                    url: d.url || ""
-                };
-            });
-
-            // Mapa de IDs para filtrar links rotos
+            // Mapa para validar links
             const nodeIds = new Set(nodes.map(d => d.id));
 
+            // Filtrar links que apunten a nodos inexistentes
             const links = rawLinks.filter(d => {
-                // Verificar que source y target existen
-                if (nodeIds.has(d.source) && nodeIds.has(d.target)) {
-                    return true;
-                }
-                return false;
+                return nodeIds.has(d.source) && nodeIds.has(d.target);
             }).map(d => ({
                 source: d.source,
                 target: d.target,
@@ -474,180 +477,158 @@
                 amount: d.amount
             }));
 
-            console.log(`Datos finales: ${nodes.length} nodos, ${links.length} links.`);
-
-            // 3. LÓGICA DE CONTADORES (Actualizada)
+            // ----------------------------------------------------
+            // LÓGICA DE CONTADORES (Fix: Ahora usa los datos procesados)
+            // ----------------------------------------------------
             const counts = { 1:0, 2:0, 3:0, 4:0, 5:0, 'calls':0 };
             
             nodes.forEach(n => {
-                let g = n.group;
-                // Si es 6, 7 u 8, cuenta como 'calls'
-                if (g >= 6 && g <= 8) {
-                    counts['calls']++;
+                const g = n.group;
+                if (g >= 6 && g <= 8) { 
+                    counts['calls']++; // Agrupa Call 1, 2, 3
                 } else if (counts[g] !== undefined) {
                     counts[g]++;
                 }
             });
 
-            // Función segura para actualizar el HTML
-            const updateBadge = (id, val) => {
+            // Actualizar HTML de la leyenda
+            const updateCount = (id, val) => {
                 const el = document.getElementById(id);
                 if (el) el.textContent = `(${val})`;
             };
+            updateCount('count-1', counts[1]);
+            updateCount('count-2', counts[2]);
+            updateCount('count-3', counts[3]);
+            updateCount('count-calls', counts['calls']); // Este es el de proyectos
+            updateCount('count-5', counts[5]);
 
-            updateBadge('count-1', counts[1]);
-            updateBadge('count-2', counts[2]);
-            updateBadge('count-3', counts[3]);
-            updateBadge('count-4', counts[4]);
-            updateBadge('count-calls', counts['calls']);
-            updateBadge('count-5', counts[5]);
-
-
-            // --- CONFIGURACIÓN D3 ---
+            // ----------------------------------------------------
+            // CONFIGURACIÓN D3
+            // ----------------------------------------------------
             const width = window.innerWidth;
             const height = window.innerHeight;
             
-            // Definir colores
+            // Colores
             const colorScale = {
                 1: "#60a5fa", 2: "#34d399", 3: "#f87171", 4: "#c084fc", 
                 5: "#fbbf24", 6: "#f472b6", 7: "#ec4899", 8: "#db2777"
             };
 
-            // SVG Setup
             const svg = d3.select("#graph-container").append("svg")
-                .attr("width", width)
-                .attr("height", height);
+                .attr("width", width).attr("height", height);
 
-            // Flechas (Markers)
+            // Flechas
             svg.append("defs").selectAll("marker")
-                .data(["end"])
-                .enter().append("marker")
-                .attr("id", "arrow")
-                .attr("viewBox", "0 -5 10 10")
-                .attr("refX", 25)
-                .attr("refY", 0)
-                .attr("markerWidth", 6)
-                .attr("markerHeight", 6)
+                .data(["end"]).enter().append("marker")
+                .attr("id", "arrow").attr("viewBox", "0 -5 10 10")
+                .attr("refX", 25).attr("refY", 0)
+                .attr("markerWidth", 6).attr("markerHeight", 6)
                 .attr("orient", "auto")
-                .append("path")
-                .attr("d", "M0,-5L10,0L0,5")
-                .attr("fill", "#94a3b8"); 
+                .append("path").attr("d", "M0,-5L10,0L0,5").attr("fill", "#94a3b8"); 
 
             const g = svg.append("g");
-            const indicatorsLayer = svg.append("g").attr("class", "indicators-layer");
             const tooltip = d3.select("#tooltip");
-            
-            // --- SIMULACIÓN ---
+
+            // Simulación
             const simulation = d3.forceSimulation(nodes)
                 .velocityDecay(0.3)
-                .force("link", d3.forceLink(links).id(d => d.id).distance(200))
-                .force("charge", d3.forceManyBody().strength(-500))
+                .force("link", d3.forceLink(links).id(d => d.id).distance(200)) // Distancia base
+                .force("charge", d3.forceManyBody().strength(-400))
                 .force("center", d3.forceCenter(width / 2, height / 2))
-                .force("collide", d3.forceCollide().radius(d => d.size + 10).strength(0.8));
+                .force("collide", d3.forceCollide().radius(d => d.size + 15).strength(0.7));
 
-            // --- DIBUJO ---
-            let link = g.append("g").selectAll("line")
+            // Dibujo de elementos
+            const link = g.append("g").selectAll("line")
                 .data(links).enter().append("line")
-                .attr("stroke", "#ffffff")
-                .attr("stroke-opacity", 0.3)
-                .attr("stroke-width", 1.5)
-                .attr("marker-end", "url(#arrow)");
+                .attr("stroke", "#ffffff").attr("stroke-opacity", 0.3)
+                .attr("stroke-width", 1.5).attr("marker-end", "url(#arrow)");
 
-            let linkLabel = g.append("g").selectAll("text")
+            const linkLabel = g.append("g").selectAll("text")
                 .data(links).enter().append("text")
                 .attr("class", d => d.amount ? "link-label money" : "link-label")
                 .attr("dy", -5)
                 .text(d => d.amount ? d.amount : d.type);
 
-            let node = g.append("g").selectAll("circle")
+            const node = g.append("g").selectAll("circle")
                 .data(nodes).enter().append("circle")
                 .attr("r", d => d.size)
-                .attr("fill", d => colorScale[d.group] || "#999") // Color fallback
-                .attr("stroke", "#fff")
-                .attr("stroke-width", 2)
-                .attr("stroke-opacity", 0.8)
+                .attr("fill", d => colorScale[d.group] || "#999")
+                .attr("stroke", "#fff").attr("stroke-width", 2).attr("stroke-opacity", 0.8)
                 .call(d3.drag()
-                    .on("start", dragstarted)
-                    .on("drag", dragged)
-                    .on("end", dragended));
+                    .on("start", dragstarted).on("drag", dragged).on("end", dragended));
 
-            let label = g.append("g").selectAll("text")
+            const label = g.append("g").selectAll("text")
                 .data(nodes).enter().append("text")
                 .text(d => d.label)
-                .attr("font-size", "10px")
-                .attr("fill", "#e2e8f0")
+                .attr("font-size", "10px").attr("fill", "#e2e8f0")
                 .attr("class", "node-label") 
-                .attr("dx", d => d.size + 6)
-                .attr("dy", 4);
+                .attr("dx", d => d.size + 6).attr("dy", 4);
 
-            // --- INTERACCIONES Y BUSCADOR ---
+            // ----------------------------------------------------
+            // INTERACCIONES Y BUSCADOR (ARREGLADO)
+            // ----------------------------------------------------
             
-            // Zoom
+            // 1. Zoom
             const zoomBehavior = d3.zoom()
                 .scaleExtent([0.1, 4])
-                .on("zoom", (event) => {
-                    g.attr("transform", event.transform);
-                });
+                .on("zoom", (event) => g.attr("transform", event.transform));
             svg.call(zoomBehavior);
 
-            // Funciones de Click/Hover
+            // 2. Click en Nodo
             function highlightNode(d) {
-                // Reset previo
-                node.attr("stroke", "#fff").attr("stroke-width", 2);
+                // Reset visual
+                node.attr("stroke", "#fff").attr("stroke-width", 2).style("filter", null);
                 link.attr("stroke-opacity", 0.1);
                 linkLabel.style("opacity", 0.1);
 
-                // Highlight actual
-                const relatedLinks = links.filter(l => l.source.id === d.id || l.target.id === d.id);
-                const relatedNodeIds = new Set();
-                relatedLinks.forEach(l => {
-                    relatedNodeIds.add(l.source.id);
-                    relatedNodeIds.add(l.target.id);
-                });
+                // Highlight
+                node.filter(n => n.id === d.id).attr("stroke", "#22d3ee").attr("stroke-width", 4)
+                    .style("filter", `drop-shadow(0 0 15px ${colorScale[d.group]})`);
 
-                node.filter(n => n.id === d.id || relatedNodeIds.has(n.id))
-                    .attr("stroke", "#22d3ee")
-                    .attr("stroke-width", 4);
-
-                link.filter(l => l.source.id === d.id || l.target.id === d.id)
-                    .attr("stroke-opacity", 1)
-                    .attr("stroke-width", 2);
+                const connectedLinks = link.filter(l => l.source.id === d.id || l.target.id === d.id);
+                connectedLinks.attr("stroke-opacity", 1).attr("stroke-width", 2);
                 
-                linkLabel.filter(l => l.source.id === d.id || l.target.id === d.id)
-                    .style("opacity", 1);
+                linkLabel.filter(l => l.source.id === d.id || l.target.id === d.id).style("opacity", 1);
             }
 
             node.on("click", (event, d) => {
                 event.stopPropagation();
                 highlightNode(d);
-                // Tooltip manual
                 tooltip.style("opacity", 1)
-                       .html(`<b>${d.label}</b><br>${d.desc}`)
-                       .style("left", (event.pageX + 20) + "px")
-                       .style("top", (event.pageY - 20) + "px");
+                       .html(`<div class='font-bold' style='color:${colorScale[d.group]}'>${d.label}</div><div class='text-xs mt-1'>${d.desc}</div>`)
+                       .style("left", (event.pageX + 15) + "px")
+                       .style("top", (event.pageY - 15) + "px");
             });
 
+            // 3. Click Fondo (Reset)
             svg.on("click", () => {
-                // Click en fondo resetea
-                node.attr("stroke", "#fff").attr("stroke-width", 2);
+                node.attr("stroke", "#fff").attr("stroke-width", 2).style("filter", null);
                 link.attr("stroke-opacity", 0.3);
                 linkLabel.style("opacity", 1);
                 tooltip.style("opacity", 0);
             });
 
-            // BUSCADOR (REPARADO)
+            // 4. BUSCADOR (Ahora funciona porque tiene acceso a 'nodes')
             const searchInput = document.getElementById('search-input');
+            
             searchInput.addEventListener('input', (e) => {
                 const term = e.target.value.toLowerCase().trim();
-                if (!term) return;
+                
+                // Si está vacío, resetear
+                if (!term) {
+                    // Simular click en fondo para resetear
+                    svg.dispatch("click"); 
+                    return;
+                }
 
+                // Buscar
                 const found = nodes.find(n => n.label.toLowerCase().includes(term));
                 
                 if (found) {
                     highlightNode(found);
                     
-                    // Centrar cámara
-                    const scale = 2;
+                    // Zoom suave hacia el nodo encontrado
+                    const scale = 2; 
                     const transform = d3.zoomIdentity
                         .translate(width / 2, height / 2)
                         .scale(scale)
@@ -657,47 +638,23 @@
                 }
             });
 
+            // Funciones Drag & Tick
+            function dragstarted(event, d) { if (!event.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; }
+            function dragged(event, d) { d.fx = event.x; d.fy = event.y; }
+            function dragended(event, d) { if (!event.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; }
 
-            // Funciones Drag
-            function dragstarted(event, d) {
-                if (!event.active) simulation.alphaTarget(0.3).restart();
-                d.fx = d.x;
-                d.fy = d.y;
-            }
-            function dragged(event, d) {
-                d.fx = event.x;
-                d.fy = event.y;
-            }
-            function dragended(event, d) {
-                if (!event.active) simulation.alphaTarget(0);
-                d.fx = null;
-                d.fy = null;
-            }
-
-            // Loop de animación
             simulation.on("tick", () => {
-                link
-                    .attr("x1", d => d.source.x)
-                    .attr("y1", d => d.source.y)
-                    .attr("x2", d => d.target.x)
-                    .attr("y2", d => d.target.y);
-
-                linkLabel
-                    .attr("x", d => (d.source.x + d.target.x) / 2)
-                    .attr("y", d => (d.source.y + d.target.y) / 2);
-
-                node
-                    .attr("cx", d => d.x)
-                    .attr("cy", d => d.y);
-
-                label
-                    .attr("x", d => d.x)
-                    .attr("y", d => d.y);
+                link.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
+                    .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
+                linkLabel.attr("x", d => (d.source.x + d.target.x) / 2)
+                         .attr("y", d => (d.source.y + d.target.y) / 2);
+                node.attr("cx", d => d.x).attr("cy", d => d.y);
+                label.attr("x", d => d.x).attr("y", d => d.y);
             });
 
         }).catch(err => {
-            console.error("ERROR FATAL CARGANDO DATOS:", err);
-            alert("Error cargando CSV. Mira la consola (F12).");
+            console.error("Error cargando:", err);
+            alert("Error cargando los datos CSV. Mira la consola.");
         });
     });
 </script>
