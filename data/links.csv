@@ -7,6 +7,8 @@ NextGenEU,RESTART,PNRR Funds,Funding Source
 SNS JU,Call 1,~€380M,Allocation
 SNS JU,Call 2,~€130M,Allocation
 SNS JU,Call 3,TBD,Allocation
+SNS JU,SNS OPS,,Funding
+SNS JU,SNS ICE,,Funding
 BMBF,6G-ANNA,€38.4M,Grant (70%)
 BMBF,Fraunhofer,~€70M (Hubs),Hub Funding
 France 2030,PEPR Networks,€65M,Funding Program
@@ -196,12 +198,65 @@ Orange,6G-INTENSE,,Partner
 Nextworks,6G-INTENSE,,Partner
 UGR,6G-INTENSE,,Partner
 Nearby,6G-INTENSE,,Partner
-Call 1,BeGREEN,,Funds
-Call 1,5G-EPICENTRE,,Funds
-Call 1,FIDAL,,Funds
-Call 1,IMAGINE-B5G,,Funds
-Call 1,SEASON,,Funds
-Call 1,VERGE-C1,,Funds
+Call 1,5G-STARDUST,,Stream A
+Call 1,6Green,,Stream A
+Call 1,ACROSS,,Stream A
+Call 1,BeGREEN,,Stream A
+Call 1,NANCY,,Stream A
+Call 1,SEASON,,Stream A
+Call 1,VERGE-C1,,Stream A
+Call 1,6G-NTN,,Stream B
+Call 1,6G-SHINE,,Stream B
+Call 1,6GTandem,,Stream B
+Call 1,ADROIT6G,,Stream B
+Call 1,CENTRIC,,Stream B
+Call 1,CONFIDENTIAL6G,,Stream B
+Call 1,DESIRE6G,,Stream B
+Call 1,DETERMINISTIC6G,,Stream B
+Call 1,ETHER,,Stream B
+Call 1,FLEX-SCALE,,Stream B
+Call 1,HORSE,,Stream B
+Call 1,PREDICT-6G,,Stream B
+Call 1,PRIVATEER,,Stream B
+Call 1,RIGOUROUS,,Stream B
+Call 1,SUPERIOT,,Stream B
+Call 1,TERA6G,,Stream B
+Call 1,TERRAMETA,,Stream B
+Call 1,TIMES,,Stream B
+Call 1,6G-BRICKS,,Stream C
+Call 1,6G-SANDBOX,,Stream C
+Call 1,6G-XR,,Stream C
+Call 1,FIDAL,,Stream D
+Call 1,IMAGINE-B5G,,Stream D
+Call 1,TARGET-X,,Stream D
+Call 1,TrialsNet,,Stream D
+CENER,5G-STARDUST,,Coordinator
+Martel,5G-STARDUST,,Partner
+CNIT,6Green,,Coordinator
+UOWM,NANCY,,Coordinator
+Technikon,6GTandem,,Coordinator
+Technikon,ADROIT6G,,Coordinator
+Univ Bologna,CENTRIC,,Coordinator
+WINGS ICT,CONFIDENTIAL6G,,Coordinator
+Univ Amsterdam,DESIRE6G,,Coordinator
+Ericsson,DETERMINISTIC6G,,Coordinator
+Ericsson,TrialsNet,,Coordinator
+Univ Patras,FLEX-SCALE,,Coordinator
+Nokia,Hexa-X-II,,Coordinator
+CNIT,HORSE,,Coordinator
+UC3M,PREDICT-6G,,Coordinator
+UC3M,TERA6G,,Coordinator
+Space Hellas,PRIVATEER,,Coordinator
+Univ Murcia,RIGOUROUS,,Coordinator
+Eurecat,SUPERIOT,,Coordinator
+INESC TEC,TERRAMETA,,Coordinator
+CNIT,TIMES,,Coordinator
+Fraunhofer IPT,TARGET-X,,Coordinator
+Keysight,6G-SANDBOX,,Coordinator
+ISI/Athena,6G-BRICKS,,Coordinator
+Eurescom,SNS OPS,,Coordinator
+Eurescom,SNS ICE,,Coordinator
+Call 1,5G-EPICENTRE,,Stream A
 Call 2,6G-MIRAI,,Funds
 Call 2,6G-NTN,,Funds
 Call 2,6G-SENSES,,Funds
@@ -210,7 +265,6 @@ Call 2,6G-GOALS,,Funds
 Call 2,ADROIT6G,,Funds
 Call 2,ASSET-6G,,Funds
 Call 2,BELIEVE-6G,,Funds
-Call 2,CENTRIC,,Funds
 Call 2,COMBO-6G,,Funds
 Call 2,DETERMINISTIC6G,,Funds
 Call 2,EXIGENCE,,Funds
