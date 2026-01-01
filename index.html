@@ -3,343 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>European 6G Ecosystem</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #020617; /* Very dark slate/black */
-            color: #e2e8f0;
-            overflow: hidden; 
-        }
-        
-        #graph-container {
-            width: 100vw;
-            height: 100vh;
-            position: relative;
-            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
-        }
-
-        /* --- CSS TRANSITIONS --- */
-        circle {
-            transition: stroke 0.3s ease, stroke-width 0.3s ease, filter 0.3s ease, r 0.3s ease;
-        }
-        
-        /* Text Label Styling - Interactive */
-        text.node-label {
-            transition: fill 0.2s ease, font-weight 0.2s ease;
-            cursor: pointer; 
-        }
-        
-        text.node-label:hover {
-            fill: #22d3ee !important; /* Cyan-400 on hover */
-            text-decoration: underline;
-            font-weight: 700;
-        }
-
-        .tooltip {
-            position: absolute;
-            background: rgba(0, 0, 0, 0.9);
-            color: white;
-            padding: 12px 16px;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            pointer-events: none;
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); 
-            opacity: 0;
-            transition: opacity 0.2s;
-            max-width: 300px;
-            z-index: 50;
-            border: 1px solid rgba(255,255,255,0.2);
-            backdrop-filter: blur(8px);
-        }
-
-        .action-hint {
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            color: #fbbf24; /* Amber-400 */
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 0.5rem;
-            font-size: 0.8rem;
-            color: #cbd5e1;
-            white-space: nowrap;
-        }
-        
-        .legend-color {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-right: 8px;
-            box-shadow: 0 0 5px currentColor;
-            flex-shrink: 0;
-        }
-
-        .count-badge {
-            margin-left: auto;
-            padding-left: 8px;
-            font-weight: bold;
-            color: #64748b;
-            font-size: 0.75rem;
-        }
-        
-        .total-investment-box {
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            border-radius: 8px;
-            padding: 10px;
-            text-align: center;
-        }
-        
-        .total-investment-label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #6ee7b7;
-            margin-bottom: 2px;
-        }
-        
-        .total-investment-value {
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: #fff;
-            text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
-        }
-
-        .link-label {
-            font-size: 10px;
-            font-family: 'Inter', sans-serif;
-            fill: #94a3b8;
-            text-anchor: middle;
-            paint-order: stroke;
-            stroke: #020617; /* Halo background */
-            stroke-width: 4px;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            pointer-events: none;
-        }
-        
-        .link-label.money {
-            fill: #4ade80; /* Neon Green */
-            font-weight: 800; 
-            font-size: 12px;
-            filter: drop-shadow(0 0 4px rgba(34, 197, 94, 0.4));
-        }
-
-        /* Indicator Styles */
-        .indicator {
-            cursor: pointer;
-            filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));
-        }
-        
-        .indicator path {
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), stroke 0.2s;
-            transform-origin: center;
-            transform-box: fill-box; 
-        }
-        
-        .indicator:hover path {
-            transform: scale(1.5); 
-            stroke: #fff; 
-        }
-
-        /* Interactive Node Style */
-        .node-interactive {
-            cursor: pointer;
-        }
-
-        /* Scrollbar for the overlay */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #1e293b; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #475569; 
-            border-radius: 3px;
-        }
-    </style>
-</head>
-<body>
-
-    <!-- UI Overlay -->
-    <div class="absolute top-4 left-4 z-10 bg-slate-900/80 backdrop-blur-md p-5 rounded-xl shadow-2xl border border-slate-700 max-w-sm max-h-[90vh] overflow-y-auto flex flex-col gap-4">
-        <div>
-            <h1 class="text-xl font-bold text-white mb-1">European 6G Ecosystem</h1>
-            <p class="text-xs text-slate-400 leading-relaxed mb-3">
-                Funding flows and strategic relationships.
-            </p>
-            
-            <!-- Total Investment Box -->
-            <div class="total-investment-box">
-                <div class="total-investment-label">Est. Total Investment</div>
-                <div class="total-investment-value">&gt; €3.8 Billion</div>
-            </div>
-
-            <p class="text-xs text-slate-400">
-                <span class="text-amber-400 font-semibold mt-1 block border-t border-slate-600 pt-2">Controls:</span>
-                • Click <strong>Circle</strong> to Zoom/Focus.<br>
-                • Click <strong>Name</strong> to Visit Website.
-            </p>
-        </div>
-
-        <!-- Search Input -->
-        <div class="relative">
-            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <svg class="w-4 h-4 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-                </svg>
-            </div>
-            <input type="text" id="search-input" class="block w-full p-2 pl-10 text-sm text-white border border-slate-600 rounded-lg bg-slate-800 focus:ring-blue-500 focus:border-blue-500 placeholder-slate-400" placeholder="Search (e.g. 6G-XR, Matsuko, VTT)...">
-        </div>
-        
-        <!-- Legend -->
-        <div class="space-y-2 border-t border-slate-700 pt-4">
-            <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Legend</h3>
-            <div class="legend-item"><div class="legend-color" style="background: #60a5fa; color: #60a5fa;"></div>EU Institution / Governance <span id="count-1" class="count-badge"></span></div>
-            <div class="legend-item"><div class="legend-color" style="background: #34d399; color: #34d399;"></div>National Gov / Hub <span id="count-2" class="count-badge"></span></div>
-            <div class="legend-item"><div class="legend-color" style="background: #f87171; color: #f87171;"></div>Private Company <span id="count-3" class="count-badge"></span></div>
-            <div class="legend-item"><div class="legend-color" style="background: #c084fc; color: #c084fc;"></div>Project (Flagship/General) <span id="count-4" class="count-badge"></span></div>
-            <div class="legend-item"><div class="legend-color" style="background: #f472b6; color: #f472b6;"></div>Funding Calls (Stream) <span id="count-calls" class="count-badge"></span></div>
-            <div class="legend-item"><div class="legend-color" style="background: #fbbf24; color: #fbbf24;"></div>Research / University <span id="count-5" class="count-badge"></span></div>
-        </div>
-    </div>
-    
-    <!-- Footer Branding -->
-    <div class="absolute bottom-4 left-4 z-10 text-white text-sm font-bold tracking-widest opacity-80 pointer-events-none" style="font-family: 'Inter', sans-serif;">
-        stop6g.eu
-    </div>
-
-    <!-- Tooltip Element -->
-    <div id="tooltip" class="tooltip"></div>
-
-    <!-- Graph Container -->
-    <div id="graph-container"></div>
-
-  <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>European 6G Ecosystem</title>
+    <title>European 6G Ecosystem (Fixed)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap');
         
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #020617;
-            color: #e2e8f0;
-            overflow: hidden; 
-        }
-        
-        #graph-container {
-            width: 100vw;
-            height: 100vh;
-            position: relative;
-            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
-        }
-
-        /* Transitions */
+        body { font-family: 'Inter', sans-serif; background-color: #020617; color: #e2e8f0; overflow: hidden; }
+        #graph-container { width: 100vw; height: 100vh; position: relative; background: radial-gradient(circle at center, #0f172a 0%, #020617 100%); }
         circle { transition: all 0.3s ease; }
-        text.node-label { transition: fill 0.2s ease, font-weight 0.2s ease; cursor: pointer; }
-        text.node-label:hover { fill: #22d3ee !important; text-decoration: underline; font-weight: 700; }
-
+        text.node-label { transition: all 0.2s ease; cursor: pointer; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        text.node-label:hover { fill: #22d3ee !important; font-weight: 700; text-decoration: underline; }
+        
+        /* Tooltip Style */
         .tooltip {
-            position: absolute;
-            background: rgba(0, 0, 0, 0.9);
-            color: white;
-            padding: 12px 16px;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            pointer-events: none;
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); 
-            opacity: 0;
-            transition: opacity 0.2s;
-            max-width: 300px;
-            z-index: 50;
-            border: 1px solid rgba(255,255,255,0.2);
-            backdrop-filter: blur(8px);
+            position: absolute; background: rgba(15, 23, 42, 0.95); color: white;
+            padding: 12px 16px; border-radius: 8px; font-size: 0.85rem;
+            pointer-events: none; opacity: 0; transition: opacity 0.2s;
+            max-width: 320px; z-index: 60;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
         }
 
-        .legend-item {
-            display: flex; align-items: center; margin-bottom: 0.5rem;
-            font-size: 0.8rem; color: #cbd5e1; white-space: nowrap;
-        }
-        
-        .legend-color {
-            width: 12px; height: 12px; border-radius: 50%;
-            margin-right: 8px; box-shadow: 0 0 5px currentColor; flex-shrink: 0;
-        }
+        /* Link Labels */
+        .link-label { font-size: 9px; font-family: 'Inter', sans-serif; fill: #64748b; text-anchor: middle; pointer-events: none; }
+        .link-label.money { fill: #4ade80; font-weight: 800; font-size: 11px; filter: drop-shadow(0 0 4px rgba(34, 197, 94, 0.3)); }
 
-        .count-badge {
-            margin-left: auto; padding-left: 8px; font-weight: bold;
-            color: #64748b; font-size: 0.75rem;
-        }
-        
-        .total-investment-box {
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            border-radius: 8px; padding: 10px; text-align: center;
-            cursor: help; transition: all 0.3s ease;
-        }
-        .total-investment-box:hover {
-            background: rgba(16, 185, 129, 0.2);
-            border-color: rgba(16, 185, 129, 0.6);
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
-        }
-        
-        .total-investment-label {
-            font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em;
-            color: #6ee7b7; margin-bottom: 2px;
-        }
-        .total-investment-value {
-            font-size: 1.1rem; font-weight: 800; color: #fff;
-            text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
-        }
-
-        /* Investment Breakdown Popup */
-        #investment-breakdown {
-            backdrop-filter: blur(12px); pointer-events: none; opacity: 0; transition: opacity 0.3s ease;
-        }
-        .breakdown-row {
-            display: flex; justify-content: space-between; padding: 4px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .breakdown-row:last-child { border-bottom: none; }
-        .breakdown-val { font-family: 'JetBrains Mono', monospace; font-weight: 700; }
-
-        .link-label {
-            font-size: 10px; font-family: 'Inter', sans-serif; fill: #94a3b8;
-            text-anchor: middle; paint-order: stroke; stroke: #020617; stroke-width: 4px;
-            stroke-linecap: round; stroke-linejoin: round; pointer-events: none;
-        }
-        .link-label.money {
-            fill: #4ade80; font-weight: 800; font-size: 12px;
-            filter: drop-shadow(0 0 4px rgba(34, 197, 94, 0.4));
-        }
-
-        /* Indicator Styles (Arrows on edge) */
+        /* Indicators */
         .indicator { cursor: pointer; filter: drop-shadow(0 0 2px rgba(0,0,0,0.8)); }
-        .indicator path {
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), stroke 0.2s;
-            transform-origin: center; transform-box: fill-box; 
-        }
+        .indicator path { transition: transform 0.2s; transform-origin: center; transform-box: fill-box; }
         .indicator:hover path { transform: scale(1.5); stroke: #fff; }
 
+        /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #1e293b; }
         ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
@@ -347,318 +43,296 @@
 </head>
 <body>
 
-    <div id="investment-breakdown" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-slate-900/95 border border-emerald-500/30 p-6 rounded-2xl shadow-2xl z-[60] min-w-[320px]">
-        <h3 class="text-emerald-400 font-bold text-sm tracking-widest uppercase mb-4 text-center border-b border-emerald-500/20 pb-2">Investment Breakdown</h3>
-        <div class="space-y-2 text-xs text-slate-300">
-            <div class="breakdown-row"><span>🇪🇺 SNS JU (Public+Private)</span> <span class="breakdown-val text-white">€1.80B</span></div>
-            <div class="breakdown-row"><span>🇩🇪 Germany (BMBF)</span> <span class="breakdown-val text-white">€700M</span></div>
-            <div class="breakdown-row"><span>🇫🇮 Finland (Flagship)</span> <span class="breakdown-val text-white">€251M</span></div>
-            <div class="breakdown-row"><span>🇳🇱 Netherlands (FNS)</span> <span class="breakdown-val text-white">€203M</span></div>
-            <div class="breakdown-row"><span>🇮🇹 Italia (RESTART)</span> <span class="breakdown-val text-white">€118M</span></div>
-            <div class="breakdown-row"><span>🇬🇧 UK (Gov Strategy)</span> <span class="breakdown-val text-white">~€115M</span></div>
-            <div class="breakdown-row"><span>🇪🇸 Spain (UNICO)</span> <span class="breakdown-val text-white">>€100M</span></div>
-            <div class="breakdown-row"><span>🇫🇷 France (PEPR)</span> <span class="breakdown-val text-white">€65M</span></div>
-            <div class="breakdown-row"><span>🇪🇺 EDF (Defence)</span> <span class="breakdown-val text-white">€10M+</span></div>
-        </div>
-    </div>
-
-    <div id="legend" class="absolute top-4 left-4 z-10 bg-slate-900/90 backdrop-blur-md p-5 rounded-xl shadow-2xl border border-slate-700 max-w-sm max-h-[90vh] overflow-y-auto flex flex-col gap-4 transition-all duration-300">
+    <div id="ui-layer" class="absolute top-4 left-4 z-50 flex flex-col gap-4 max-w-sm max-h-[90vh]">
         
-        <div class="cursor-pointer group flex justify-between items-start" onclick="toggleLegend()">
-            <div>
-                <h1 class="text-xl font-bold text-white mb-1 flex items-center gap-2">
-                    European 6G Ecosystem
-                </h1>
-                <p class="text-xs text-slate-400 leading-relaxed">
-                    Funding flows & strategic relationships.
-                </p>
-            </div>
-            <div id="legend-arrow" class="text-slate-400 transform transition-transform duration-300 mt-1">▼</div>
-        </div>
-
-        <div id="legend-content" class="flex flex-col gap-4 transition-all duration-300">
-            
-            <div class="relative mt-2">
-                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 20 20" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-                    </svg>
+        <div class="bg-slate-900/90 backdrop-blur-md p-5 rounded-xl shadow-2xl border border-slate-700/50 overflow-y-auto transition-all duration-300">
+            <div class="cursor-pointer group flex justify-between items-start" onclick="toggleLegend()">
+                <div>
+                    <h1 class="text-xl font-bold text-white mb-1">European 6G</h1>
+                    <p class="text-xs text-slate-400">Ecosystem & Funding Map</p>
                 </div>
-                <input type="text" id="search-input" class="block w-full p-2 pl-10 text-sm text-white border border-slate-600 rounded-lg bg-slate-800 focus:ring-blue-500 focus:border-blue-500 placeholder-slate-400" placeholder="Search entity...">
+                <div id="legend-arrow" class="text-slate-400 transform transition-transform duration-300 mt-1">▼</div>
             </div>
-            
-            <div class="space-y-2 border-t border-slate-700 pt-4 text-sm">
-                <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Legend</h3>
+
+            <div id="legend-content" class="flex flex-col gap-4 mt-4 transition-all duration-300">
                 
-                <div class="flex items-center justify-between p-1 hover:bg-white/5 rounded">
-                    <div class="flex items-center"><span class="w-3 h-3 rounded-full mr-2 bg-blue-400 shadow-[0_0_5px_#60a5fa]"></span>Governance</div>
-                    <span id="count-1" class="text-xs font-mono text-slate-500 font-bold"></span>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 20 20" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/></svg>
+                    </div>
+                    <input type="text" id="search-input" class="block w-full p-2 pl-10 text-xs text-white border border-slate-600 rounded-lg bg-slate-800 focus:ring-blue-500 focus:border-blue-500 placeholder-slate-500" placeholder="Search (e.g. Nokia, Call 1)...">
                 </div>
 
-                <div class="flex items-center justify-between p-1 hover:bg-white/5 rounded">
-                    <div class="flex items-center"><span class="w-3 h-3 rounded-full mr-2 bg-emerald-400 shadow-[0_0_5px_#34d399]"></span>National Hubs</div>
-                    <span id="count-2" class="text-xs font-mono text-slate-500 font-bold"></span>
+                <div class="space-y-1 border-t border-slate-700 pt-3 text-xs">
+                    <div class="flex items-center justify-between p-1 rounded hover:bg-white/5"><div class="flex items-center"><span class="w-2 h-2 rounded-full mr-2 bg-blue-400 shadow-[0_0_6px_#60a5fa]"></span>Governance</div><span id="count-1" class="font-mono text-slate-500 font-bold"></span></div>
+                    <div class="flex items-center justify-between p-1 rounded hover:bg-white/5"><div class="flex items-center"><span class="w-2 h-2 rounded-full mr-2 bg-emerald-400 shadow-[0_0_6px_#34d399]"></span>National Hubs</div><span id="count-2" class="font-mono text-slate-500 font-bold"></span></div>
+                    <div class="flex items-center justify-between p-1 rounded hover:bg-white/5"><div class="flex items-center"><span class="w-2 h-2 rounded-full mr-2 bg-red-400 shadow-[0_0_6px_#f87171]"></span>Corporates</div><span id="count-3" class="font-mono text-slate-500 font-bold"></span></div>
+                    <div class="flex items-center justify-between p-1 rounded hover:bg-white/5"><div class="flex items-center"><span class="w-2 h-2 rounded-full mr-2 bg-purple-400 shadow-[0_0_6px_#c084fc]"></span>Projects (A-D)</div><span id="count-4" class="font-mono text-slate-500 font-bold"></span></div>
+                    <div class="flex items-center justify-between p-1 rounded hover:bg-white/5"><div class="flex items-center"><span class="w-2 h-2 rounded-full mr-2 bg-pink-400 shadow-[0_0_6px_#f472b6]"></span>Funding Calls</div><span id="count-calls" class="font-mono text-slate-500 font-bold"></span></div>
+                    <div class="flex items-center justify-between p-1 rounded hover:bg-white/5"><div class="flex items-center"><span class="w-2 h-2 rounded-full mr-2 bg-amber-400 shadow-[0_0_6px_#fbbf24]"></span>Research / Univ</div><span id="count-5" class="font-mono text-slate-500 font-bold"></span></div>
                 </div>
 
-                <div class="flex items-center justify-between p-1 hover:bg-white/5 rounded">
-                    <div class="flex items-center"><span class="w-3 h-3 rounded-full mr-2 bg-red-400 shadow-[0_0_5px_#f87171]"></span>Corporates</div>
-                    <span id="count-3" class="text-xs font-mono text-slate-500 font-bold"></span>
+                <div class="bg-emerald-900/20 border border-emerald-500/30 rounded p-2 text-center">
+                    <div class="text-[9px] uppercase tracking-wider text-emerald-400">Total Investment</div>
+                    <div class="text-sm font-bold text-white">> €3.8 Billion</div>
                 </div>
 
-                <div class="flex items-center justify-between p-1 hover:bg-white/5 rounded">
-                    <div class="flex items-center"><span class="w-3 h-3 rounded-full mr-2 bg-purple-400 shadow-[0_0_5px_#c084fc]"></span>Projects (A,B,C,D)</div>
-                    <span id="count-calls" class="text-xs font-mono text-slate-500 font-bold"></span>
-                </div>
-
-                <div class="flex items-center justify-between p-1 hover:bg-white/5 rounded">
-                    <div class="flex items-center"><span class="w-3 h-3 rounded-full mr-2 bg-amber-400 shadow-[0_0_5px_#fbbf24]"></span>Research / Univ</div>
-                    <span id="count-5" class="text-xs font-mono text-slate-500 font-bold"></span>
+                <div class="text-center pt-2 border-t border-slate-700">
+                    <a href="https://stop6g.eu" target="_blank" class="text-[10px] font-bold tracking-[0.2em] text-slate-500 hover:text-red-500 transition-colors uppercase font-mono">STOP6G.EU</a>
                 </div>
             </div>
-
-            <div id="investment-box-trigger" class="bg-emerald-900/20 border border-emerald-500/30 rounded-lg p-3 text-center cursor-help hover:bg-emerald-900/40 transition-all shadow-[0_0_15px_rgba(16,185,129,0.1)]">
-                <div class="text-[10px] uppercase tracking-wider text-emerald-400 mb-1">Est. Total Investment</div>
-                <div class="text-lg font-extrabold text-white text-shadow-sm">> €3.8 Billion</div>
-            </div>
-
-            <div class="mt-2 text-center border-t border-slate-700 pt-3">
-                <a href="https://stop6g.eu" target="_blank" class="text-xs font-bold tracking-[0.2em] text-slate-500 hover:text-red-500 transition-colors uppercase font-mono">
-                    stop6g.eu
-                </a>
-            </div>
-            
         </div>
     </div>
+
     <div id="tooltip" class="tooltip"></div>
     <div id="graph-container"></div>
-<script>
-    // Toggle Legend Function
-    function toggleLegend() {
-        const content = document.getElementById('legend-content');
-        const arrow = document.getElementById('legend-arrow');
-        // Simple toggle de clases
-        if (content.classList.contains('hidden')) {
-            content.classList.remove('hidden');
-            arrow.style.transform = 'rotate(0deg)';
-        } else {
-            content.classList.add('hidden');
-            arrow.style.transform = 'rotate(-90deg)';
-        }
-    }
 
-    window.addEventListener('load', function() {
+    <script>
+        // --- 1. DATOS COMPLETOS (INTEGRADOS PARA EVITAR ERRORES DE CARGA) ---
+        const data = {
+            nodes: [
+                // Group 1: Governance
+                { id: "SNS JU", group: 1, label: "SNS JU", size: 30, desc: "Public-Private Partnership. Budget: €900M EU + €900M Industry.", url: "https://smart-networks.europa.eu/" },
+                { id: "EU Commission", group: 1, label: "EU Commission", size: 25, desc: "Provides public funding under Horizon Europe.", url: "https://research-and-innovation.ec.europa.eu/" },
+                { id: "6G-IA", group: 1, label: "6G-IA", size: 20, desc: "Industry Association. Represents private sector matching funds.", url: "https://6g-ia.eu/" },
+                { id: "Eurescom", group: 1, label: "Eurescom", size: 16, desc: "Coordination & Support (CSA).", url: "https://www.eurescom.eu/" },
+                { id: "NextGenEU", group: 1, label: "NextGenEU", size: 28, desc: "EU Recovery Instrument.", url: "https://next-generation-eu.europa.eu/" },
+                { id: "EDF", group: 1, label: "EDF (Defence)", size: 20, desc: "European Defence Fund.", url: "https://defence-industry-space.ec.europa.eu/" },
+
+                // Group 2: Hubs
+                { id: "BMBF", group: 2, label: "BMBF (DE)", size: 20, desc: "German Federal Ministry.", url: "https://www.bmbf.de/" },
+                { id: "France 2030", group: 2, label: "France 2030", size: 20, desc: "French National Strategy.", url: "https://www.gouvernement.fr/france-2030" },
+                { id: "PEPR Networks", group: 2, label: "PEPR Networks", size: 18, desc: "Priority Research Program (FR).", url: "https://www.pepr-reseaux-futur.fr/" },
+                { id: "Business Finland", group: 2, label: "Business Finland", size: 18, desc: "Finnish innovation agency.", url: "https://www.businessfinland.fi/" },
+                { id: "Spanish Gov", group: 2, label: "Spanish Gov", size: 18, desc: "UNICO I+D 6G Program.", url: "https://avancedigital.mineco.gob.es/" },
+                { id: "RESTART", group: 2, label: "RESTART (IT)", size: 18, desc: "Italian program for Future Telecoms.", url: "https://www.restart-project.it/" },
+                { id: "FNS", group: 2, label: "FNS (NL)", size: 18, desc: "Future Network Services.", url: "https://futurenetworkservices.nl/" },
+                { id: "BELSPO", group: 2, label: "BELSPO (BE)", size: 18, desc: "Belgian Science Policy Office.", url: "https://www.belspo.be/" },
+                { id: "NCBR", group: 2, label: "NCBR (PL)", size: 18, desc: "Polish funding agency.", url: "https://www.gov.pl/web/ncbr" },
+                { id: "SERI", group: 2, label: "SERI (CH)", size: 18, desc: "Swiss State Secretariat.", url: "https://www.sbfi.admin.ch/" },
+
+                // Group 3: Corporates
+                { id: "Nokia", group: 3, label: "Nokia", size: 24, desc: "Leading Hexa-X & 6G-ANNA.", url: "https://www.nokia.com/" },
+                { id: "Ericsson", group: 3, label: "Ericsson", size: 22, desc: "Tech Manager Hexa-X.", url: "https://www.ericsson.com/" },
+                { id: "Orange", group: 3, label: "Orange", size: 20, desc: "Major French Operator.", url: "https://hellofuture.orange.com/" },
+                { id: "Telefónica", group: 3, label: "Telefónica", size: 22, desc: "Major Operator (ES).", url: "https://www.telefonica.com/" },
+                { id: "Deutsche Telekom", group: 3, label: "D. Telekom", size: 20, desc: "Leading Operator (DE).", url: "https://www.telekom.com/" },
+                { id: "Tim", group: 3, label: "TIM", size: 18, desc: "Telecom Italia.", url: "https://www.gruppotim.it/" },
+                { id: "Thales", group: 3, label: "Thales", size: 18, desc: "Security & Space.", url: "https://www.thalesgroup.com/" },
+                { id: "Airbus", group: 3, label: "Airbus", size: 18, desc: "Defence & Space.", url: "https://www.airbus.com/" },
+                { id: "Keysight", group: 3, label: "Keysight", size: 18, desc: "Measurement Giant.", url: "https://www.keysight.com/" },
+                { id: "Atos", group: 3, label: "Atos", size: 18, desc: "Digital Integration.", url: "https://eviden.com/" },
+                { id: "LMT", group: 3, label: "LMT (LV)", size: 18, desc: "Latvian Mobile Telephone.", url: "https://innovations.lmt.lv/" },
+                { id: "Siemens", group: 3, label: "Siemens", size: 18, desc: "Industrial 6G.", url: "https://www.siemens.com/" },
+
+                // Calls (Group 6,7,8 -> mapped to 'calls' count)
+                { id: "Call 1", group: 6, label: "Call 1 (2022)", size: 22, desc: "5G Evolution. ~€380M.", url: "https://smart-networks.europa.eu/" },
+                { id: "Call 2", group: 7, label: "Call 2 (2023)", size: 22, desc: "Detailed Design. ~€130M.", url: "https://smart-networks.europa.eu/" },
+                { id: "Call 3", group: 8, label: "Call 3 (2024)", size: 22, desc: "Pilots & Consolidation.", url: "https://smart-networks.europa.eu/" },
+
+                // Projects (Mixed groups 4, 6, 7)
+                { id: "Hexa-X-II", group: 4, label: "Hexa-X-II", size: 20, desc: "Flagship Blueprint.", url: "https://hexa-x-ii.eu/" },
+                { id: "6G-ANNA", group: 4, label: "6G-ANNA", size: 20, desc: "German Lighthouse.", url: "https://www.6g-anna.de/" },
+                { id: "SUSTAIN-6G", group: 4, label: "SUSTAIN-6G", size: 18, desc: "Sustainability Lighthouse.", url: "https://sustain-6g.eu/" },
+                { id: "6G-SANDBOX", group: 4, label: "6G-SANDBOX", size: 18, desc: "Testbed.", url: "https://6g-sandbox.eu/" },
+                { id: "6G-BRICKS", group: 4, label: "6G-BRICKS", size: 18, desc: "Testbed.", url: "https://6g-bricks.eu/" },
+                { id: "BeGREEN", group: 4, label: "BeGREEN", size: 16, desc: "Energy Efficiency.", url: "https://begreen-project.eu/" },
+                { id: "5G-STARDUST", group: 4, label: "5G-STARDUST", size: 16, desc: "NTN Evolution.", url: "https://5g-stardust.eu/" },
+                
+                // Research (Group 5)
+                { id: "6G Flagship", group: 5, label: "6G Flagship", size: 18, desc: "Univ. Oulu (FI).", url: "https://www.6gflagship.com/" },
+                { id: "CEA-Leti", group: 5, label: "CEA-Leti", size: 16, desc: "French Hardware.", url: "https://www.leti-cea.com/" },
+                { id: "Fraunhofer", group: 5, label: "Fraunhofer", size: 18, desc: "German Research.", url: "https://www.fraunhofer.de/" },
+                { id: "IMEC", group: 5, label: "IMEC", size: 18, desc: "Nanoelectronics (BE).", url: "https://www.imec-int.com/" },
+                { id: "CNIT", group: 5, label: "CNIT", size: 16, desc: "Italian Consortium.", url: "https://www.cnit.it/" },
+                { id: "TNO", group: 5, label: "TNO", size: 16, desc: "Dutch Research.", url: "https://www.tno.nl/" }
+            ],
+            links: [
+                { source: "EU Commission", target: "SNS JU", type: "Public Funding", amount: "€900M" },
+                { source: "6G-IA", target: "SNS JU", type: "Private Match", amount: "€900M" },
+                { source: "SNS JU", target: "Call 1", type: "Allocation", amount: "€380M" },
+                { source: "SNS JU", target: "Call 2", type: "Allocation", amount: "€130M" },
+                { source: "SNS JU", target: "Call 3", type: "Allocation", amount: "TBD" },
+                { source: "Call 1", target: "Hexa-X-II", type: "Funds" },
+                { source: "Call 1", target: "BeGREEN", type: "Funds" },
+                { source: "Call 1", target: "5G-STARDUST", type: "Funds" },
+                { source: "Call 2", target: "6G-SANDBOX", type: "Funds" },
+                { source: "Call 2", target: "6G-BRICKS", type: "Funds" },
+                { source: "Nokia", target: "Hexa-X-II", type: "Coordinator" },
+                { source: "Ericsson", target: "Hexa-X-II", type: "Tech Manager" },
+                { source: "BMBF", target: "6G-ANNA", type: "Grant" },
+                { source: "Nokia", target: "6G-ANNA", type: "Lead" },
+                { source: "France 2030", target: "PEPR Networks", type: "Funding" },
+                { source: "PEPR Networks", target: "CEA-Leti", type: "Co-Lead" },
+                { source: "Business Finland", target: "6G Flagship", type: "Funding" },
+                { source: "Spanish Gov", target: "Telefónica", type: "UNICO" }
+            ]
+        };
+
+        // --- 2. CONFIGURACIÓN D3 & LÓGICA ---
+        const width = window.innerWidth;
+        const height = window.innerHeight;
         
-        // 1. CARGA DE DATOS (CSV)
-        Promise.all([
-            d3.csv("data/nodes.csv"),
-            d3.csv("data/links.csv")
-        ]).then(function([rawNodes, rawLinks]) {
+        // Mapa de colores por grupo
+        const colorScale = {
+            1: "#60a5fa", // Blue (Gov)
+            2: "#34d399", // Emerald (Hubs)
+            3: "#f87171", // Red (Corp)
+            4: "#c084fc", // Purple (Projects)
+            5: "#fbbf24", // Amber (Research)
+            6: "#f472b6", // Pink (Call 1)
+            7: "#ec4899", // Pink (Call 2)
+            8: "#db2777"  // Pink (Call 3)
+        };
 
-            // PROCESAMIENTO: Convertir datos de texto (CSV) a tipos útiles
-            const nodes = rawNodes.map(d => ({
-                id: d.id,
-                group: parseInt(d.group, 10) || 1, // Convertir a Numero
-                size: parseInt(d.size, 10) || 10,  // Convertir a Numero
-                label: d.label || d.id,
-                desc: d.desc || "",
-                url: d.url || ""
-            }));
-
-            // Mapa para validar links
-            const nodeIds = new Set(nodes.map(d => d.id));
-
-            // Filtrar links que apunten a nodos inexistentes
-            const links = rawLinks.filter(d => {
-                return nodeIds.has(d.source) && nodeIds.has(d.target);
-            }).map(d => ({
-                source: d.source,
-                target: d.target,
-                type: d.type,
-                amount: d.amount
-            }));
-
-            // ----------------------------------------------------
-            // LÓGICA DE CONTADORES (Fix: Ahora usa los datos procesados)
-            // ----------------------------------------------------
-            const counts = { 1:0, 2:0, 3:0, 4:0, 5:0, 'calls':0 };
-            
-            nodes.forEach(n => {
-                const g = n.group;
-                if (g >= 6 && g <= 8) { 
-                    counts['calls']++; // Agrupa Call 1, 2, 3
-                } else if (counts[g] !== undefined) {
-                    counts[g]++;
-                }
-            });
-
-            // Actualizar HTML de la leyenda
-            const updateCount = (id, val) => {
-                const el = document.getElementById(id);
-                if (el) el.textContent = `(${val})`;
-            };
-            updateCount('count-1', counts[1]);
-            updateCount('count-2', counts[2]);
-            updateCount('count-3', counts[3]);
-            updateCount('count-calls', counts['calls']); // Este es el de proyectos
-            updateCount('count-5', counts[5]);
-
-            // ----------------------------------------------------
-            // CONFIGURACIÓN D3
-            // ----------------------------------------------------
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-            
-            // Colores
-            const colorScale = {
-                1: "#60a5fa", 2: "#34d399", 3: "#f87171", 4: "#c084fc", 
-                5: "#fbbf24", 6: "#f472b6", 7: "#ec4899", 8: "#db2777"
-            };
-
-            const svg = d3.select("#graph-container").append("svg")
-                .attr("width", width).attr("height", height);
-
-            // Flechas
-            svg.append("defs").selectAll("marker")
-                .data(["end"]).enter().append("marker")
-                .attr("id", "arrow").attr("viewBox", "0 -5 10 10")
-                .attr("refX", 25).attr("refY", 0)
-                .attr("markerWidth", 6).attr("markerHeight", 6)
-                .attr("orient", "auto")
-                .append("path").attr("d", "M0,-5L10,0L0,5").attr("fill", "#94a3b8"); 
-
-            const g = svg.append("g");
-            const tooltip = d3.select("#tooltip");
-
-            // Simulación
-            const simulation = d3.forceSimulation(nodes)
-                .velocityDecay(0.3)
-                .force("link", d3.forceLink(links).id(d => d.id).distance(200)) // Distancia base
-                .force("charge", d3.forceManyBody().strength(-400))
-                .force("center", d3.forceCenter(width / 2, height / 2))
-                .force("collide", d3.forceCollide().radius(d => d.size + 15).strength(0.7));
-
-            // Dibujo de elementos
-            const link = g.append("g").selectAll("line")
-                .data(links).enter().append("line")
-                .attr("stroke", "#ffffff").attr("stroke-opacity", 0.3)
-                .attr("stroke-width", 1.5).attr("marker-end", "url(#arrow)");
-
-            const linkLabel = g.append("g").selectAll("text")
-                .data(links).enter().append("text")
-                .attr("class", d => d.amount ? "link-label money" : "link-label")
-                .attr("dy", -5)
-                .text(d => d.amount ? d.amount : d.type);
-
-            const node = g.append("g").selectAll("circle")
-                .data(nodes).enter().append("circle")
-                .attr("r", d => d.size)
-                .attr("fill", d => colorScale[d.group] || "#999")
-                .attr("stroke", "#fff").attr("stroke-width", 2).attr("stroke-opacity", 0.8)
-                .call(d3.drag()
-                    .on("start", dragstarted).on("drag", dragged).on("end", dragended));
-
-            const label = g.append("g").selectAll("text")
-                .data(nodes).enter().append("text")
-                .text(d => d.label)
-                .attr("font-size", "10px").attr("fill", "#e2e8f0")
-                .attr("class", "node-label") 
-                .attr("dx", d => d.size + 6).attr("dy", 4);
-
-            // ----------------------------------------------------
-            // INTERACCIONES Y BUSCADOR (ARREGLADO)
-            // ----------------------------------------------------
-            
-            // 1. Zoom
-            const zoomBehavior = d3.zoom()
-                .scaleExtent([0.1, 4])
-                .on("zoom", (event) => g.attr("transform", event.transform));
-            svg.call(zoomBehavior);
-
-            // 2. Click en Nodo
-            function highlightNode(d) {
-                // Reset visual
-                node.attr("stroke", "#fff").attr("stroke-width", 2).style("filter", null);
-                link.attr("stroke-opacity", 0.1);
-                linkLabel.style("opacity", 0.1);
-
-                // Highlight
-                node.filter(n => n.id === d.id).attr("stroke", "#22d3ee").attr("stroke-width", 4)
-                    .style("filter", `drop-shadow(0 0 15px ${colorScale[d.group]})`);
-
-                const connectedLinks = link.filter(l => l.source.id === d.id || l.target.id === d.id);
-                connectedLinks.attr("stroke-opacity", 1).attr("stroke-width", 2);
-                
-                linkLabel.filter(l => l.source.id === d.id || l.target.id === d.id).style("opacity", 1);
+        // --- 3. CONTADORES (Lógica arreglada) ---
+        const counts = { 1:0, 2:0, 3:0, 4:0, 5:0, 'calls':0 };
+        data.nodes.forEach(n => {
+            const g = n.group;
+            if (g >= 6 && g <= 8) {
+                counts['calls']++; // Agrupa todas las Calls
+            } else if (counts[g] !== undefined) {
+                counts[g]++;
             }
-
-            node.on("click", (event, d) => {
-                event.stopPropagation();
-                highlightNode(d);
-                tooltip.style("opacity", 1)
-                       .html(`<div class='font-bold' style='color:${colorScale[d.group]}'>${d.label}</div><div class='text-xs mt-1'>${d.desc}</div>`)
-                       .style("left", (event.pageX + 15) + "px")
-                       .style("top", (event.pageY - 15) + "px");
-            });
-
-            // 3. Click Fondo (Reset)
-            svg.on("click", () => {
-                node.attr("stroke", "#fff").attr("stroke-width", 2).style("filter", null);
-                link.attr("stroke-opacity", 0.3);
-                linkLabel.style("opacity", 1);
-                tooltip.style("opacity", 0);
-            });
-
-            // 4. BUSCADOR (Ahora funciona porque tiene acceso a 'nodes')
-            const searchInput = document.getElementById('search-input');
-            
-            searchInput.addEventListener('input', (e) => {
-                const term = e.target.value.toLowerCase().trim();
-                
-                // Si está vacío, resetear
-                if (!term) {
-                    // Simular click en fondo para resetear
-                    svg.dispatch("click"); 
-                    return;
-                }
-
-                // Buscar
-                const found = nodes.find(n => n.label.toLowerCase().includes(term));
-                
-                if (found) {
-                    highlightNode(found);
-                    
-                    // Zoom suave hacia el nodo encontrado
-                    const scale = 2; 
-                    const transform = d3.zoomIdentity
-                        .translate(width / 2, height / 2)
-                        .scale(scale)
-                        .translate(-found.x, -found.y);
-                    
-                    svg.transition().duration(750).call(zoomBehavior.transform, transform);
-                }
-            });
-
-            // Funciones Drag & Tick
-            function dragstarted(event, d) { if (!event.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; }
-            function dragged(event, d) { d.fx = event.x; d.fy = event.y; }
-            function dragended(event, d) { if (!event.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; }
-
-            simulation.on("tick", () => {
-                link.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
-                    .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
-                linkLabel.attr("x", d => (d.source.x + d.target.x) / 2)
-                         .attr("y", d => (d.source.y + d.target.y) / 2);
-                node.attr("cx", d => d.x).attr("cy", d => d.y);
-                label.attr("x", d => d.x).attr("y", d => d.y);
-            });
-
-        }).catch(err => {
-            console.error("Error cargando:", err);
-            alert("Error cargando los datos CSV. Mira la consola.");
         });
-    });
-</script>
-</body>
-</html>
+
+        // Escribir en el HTML (con chequeo de seguridad)
+        const updateCount = (id, val) => {
+            const el = document.getElementById(id);
+            if(el) el.textContent = `(${val})`;
+        };
+        updateCount('count-1', counts[1]);
+        updateCount('count-2', counts[2]);
+        updateCount('count-3', counts[3]);
+        updateCount('count-4', counts[4]);
+        updateCount('count-calls', counts['calls']);
+        updateCount('count-5', counts[5]);
+
+
+        // --- 4. INICIALIZAR GRÁFICO ---
+        const svg = d3.select("#graph-container").append("svg")
+            .attr("width", width).attr("height", height);
+
+        const g = svg.append("g");
+        
+        // Flechas
+        svg.append("defs").selectAll("marker").data(["end"]).enter().append("marker")
+            .attr("id", "arrow").attr("viewBox", "0 -5 10 10").attr("refX", 25).attr("refY", 0)
+            .attr("markerWidth", 6).attr("markerHeight", 6).attr("orient", "auto")
+            .append("path").attr("d", "M0,-5L10,0L0,5").attr("fill", "#94a3b8");
+
+        // Simulación
+        const simulation = d3.forceSimulation(data.nodes)
+            .force("link", d3.forceLink(data.links).id(d => d.id).distance(180))
+            .force("charge", d3.forceManyBody().strength(-400))
+            .force("center", d3.forceCenter(width / 2, height / 2))
+            .force("collide", d3.forceCollide().radius(d => d.size + 10));
+
+        // Dibujo Elementos
+        const link = g.append("g").selectAll("line").data(data.links).enter().append("line")
+            .attr("stroke", "#fff").attr("stroke-opacity", 0.2).attr("stroke-width", 1.5).attr("marker-end", "url(#arrow)");
+
+        const linkLabel = g.append("g").selectAll("text").data(data.links).enter().append("text")
+            .attr("class", d => d.amount ? "link-label money" : "link-label")
+            .attr("dy", -5)
+            .text(d => d.amount ? d.amount : d.type);
+
+        const node = g.append("g").selectAll("circle").data(data.nodes).enter().append("circle")
+            .attr("r", d => d.size).attr("fill", d => colorScale[d.group] || "#999")
+            .attr("stroke", "#fff").attr("stroke-width", 2).attr("stroke-opacity", 0.8)
+            .call(d3.drag().on("start", dragstarted).on("drag", dragged).on("end", dragended));
+
+        const label = g.append("g").selectAll("text").data(data.nodes).enter().append("text")
+            .text(d => d.label).attr("class", "node-label")
+            .attr("dx", d => d.size + 6).attr("dy", 4)
+            .attr("font-size", "10px").attr("fill", "#e2e8f0");
+
+        // --- 5. INTERACCIONES & BUSCADOR ---
+        const tooltip = d3.select("#tooltip");
+
+        function highlightNode(d) {
+            // Reset
+            node.attr("stroke", "#fff").attr("stroke-width", 2);
+            link.attr("stroke-opacity", 0.2);
+            linkLabel.style("opacity", 0.2);
+            
+            // Highlight Target
+            const target = node.filter(n => n.id === d.id);
+            target.attr("stroke", "#22d3ee").attr("stroke-width", 4);
+            
+            // Highlight Links
+            const connected = link.filter(l => l.source.id === d.id || l.target.id === d.id);
+            connected.attr("stroke-opacity", 1);
+            
+            // Labels connected
+            linkLabel.filter(l => l.source.id === d.id || l.target.id === d.id).style("opacity", 1);
+        }
+
+        // Click en nodo
+        node.on("click", (event, d) => {
+            event.stopPropagation();
+            highlightNode(d);
+            tooltip.style("opacity", 1)
+                .html(`<div class='font-bold text-blue-300'>${d.label}</div><div class='text-xs mt-1'>${d.desc}</div>`)
+                .style("left", (event.pageX + 15) + "px").style("top", (event.pageY - 15) + "px");
+        });
+
+        // Click en texto
+        label.on("click", (event, d) => {
+            event.stopPropagation();
+            if(d.url) window.open(d.url, "_blank");
+        });
+
+        // Click fondo
+        svg.on("click", () => {
+            node.attr("stroke", "#fff").attr("stroke-width", 2);
+            link.attr("stroke-opacity", 0.2);
+            linkLabel.style("opacity", 1);
+            tooltip.style("opacity", 0);
+        });
+
+        // BUSCADOR
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            if (!term) return;
+
+            const found = data.nodes.find(n => n.label.toLowerCase().includes(term));
+            if (found) {
+                highlightNode(found);
+                // Zoom
+                const scale = 2;
+                const transform = d3.zoomIdentity.translate(width/2, height/2).scale(scale).translate(-found.x, -found.y);
+                svg.transition().duration(750).call(zoomBehavior.transform, transform);
+            }
+        });
+
+        // Zoom global
+        const zoomBehavior = d3.zoom().scaleExtent([0.1, 4]).on("zoom", (e) => g.attr("transform", e.transform));
+        svg.call(zoomBehavior);
+
+        // Simulation Ticks
+        simulation.on("tick", () => {
+            link.attr("x1", d => d.source.x).attr("y1", d => d.source.y).attr("x2", d => d.target.x).attr("y2", d => d.target.y);
+            linkLabel.attr("x", d => (d.source.x + d.target.x) / 2).attr("y", d => (d.source.y + d.target.y) / 2);
+            node.attr("cx", d => d.x).attr("cy", d => d.y);
+            label.attr("x", d => d.x).attr("y", d => d.y);
+        });
+
+        function dragstarted(event, d) { if (!event.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; }
+        function dragged(event, d) { d.fx = event.x; d.fy = event.y; }
+        function dragended(event, d) { if (!event.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; }
+
+        function toggleLegend() {
+            const content = document.getElementById('legend-content');
+            const arrow = document.getElementById('legend-arrow');
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                arrow.style.transform = 'rotate(0deg)';
+            } else {
+                content.classList.add('hidden');
+                arrow.style.transform = 'rotate(-90deg)';
+            }
+        }
+    </script>
 </body>
 </html>
