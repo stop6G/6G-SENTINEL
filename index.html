@@ -464,20 +464,37 @@
             // --- AQUI EMPIEZA LA LÓGICA ORIGINAL DE TU GRAFO ---
 
             // 2. COUNTS LOGIC
+            // 2. COUNTS LOGIC (MEJORADO)
             const counts = { 1:0, 2:0, 3:0, 4:0, 5:0, 'calls':0 };
+            
             data.nodes.forEach(node => {
-                let g = node.group;
-                if (g >= 6 && g <= 8) g = 'calls';
-                if (counts[g] !== undefined) counts[g]++;
+                // Forzamos que sea un número entero (base 10)
+                let g = parseInt(node.group, 10);
+                
+                // Si es un grupo de Calls (6, 7 u 8), lo sumamos a 'calls'
+                if (g >= 6 && g <= 8) {
+                    counts['calls']++;
+                } 
+                // Si es un grupo normal (1-5), lo sumamos si existe en el contador
+                else if (counts[g] !== undefined) {
+                    counts[g]++;
+                }
             });
 
-            // Actualizar contadores en la leyenda (si existen los elementos)
-            if(document.getElementById('count-1')) document.getElementById('count-1').textContent = `(${counts[1]})`;
-            if(document.getElementById('count-2')) document.getElementById('count-2').textContent = `(${counts[2]})`;
-            if(document.getElementById('count-3')) document.getElementById('count-3').textContent = `(${counts[3]})`;
-            if(document.getElementById('count-4')) document.getElementById('count-4').textContent = `(${counts[4]})`;
-            if(document.getElementById('count-calls')) document.getElementById('count-calls').textContent = `(${counts['calls']})`;
-            if(document.getElementById('count-5')) document.getElementById('count-5').textContent = `(${counts[5]})`;
+            console.log("Conteo de nodos:", counts); // Mira la consola (F12) para ver si cuenta bien
+
+            // Actualizar la leyenda de forma segura (verifica si el elemento existe antes de escribir)
+            const setBadge = (id, count) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = `(${count})`;
+            };
+
+            setBadge('count-1', counts[1]);
+            setBadge('count-2', counts[2]);
+            setBadge('count-3', counts[3]);
+            setBadge('count-4', counts[4]);
+            setBadge('count-calls', counts['calls']);
+            setBadge('count-5', counts[5]);
 
             // 3. D3 CONFIGURATION & CONSTANTS
             const width = window.innerWidth;
