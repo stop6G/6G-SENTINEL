@@ -82,11 +82,16 @@
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center max-w-7xl mx-auto pointer-events-auto gap-4">
             
             <!-- Logo & Title -->
-            <div class="glass-panel px-6 py-3 rounded-2xl flex-shrink-0">
-                <h1 class="text-xl md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-fuchsia-500">
+            <div class="glass-panel px-6 py-3 rounded-2xl flex-shrink-0 flex flex-col justify-center min-w-[200px]">
+                <h1 class="text-xl md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-fuchsia-500 leading-tight">
                     EU 6G Ecosystem
                 </h1>
-                <p class="text-[10px] md:text-xs text-gray-400 font-bold text-fuchsia-200">SNS-JU 2022-2024</p>
+                <div class="flex items-center justify-between gap-3 mt-1">
+                    <p class="text-[10px] md:text-xs text-gray-400 font-bold text-fuchsia-200">SNS-JU 2022-2024</p>
+                    <span class="h-3 w-px bg-gray-700"></span>
+                    <!-- Total Investment Display -->
+                    <p class="text-[10px] md:text-xs text-emerald-400 font-mono font-bold" id="header-total-investment">0 €</p>
+                </div>
             </div>
 
             <!-- Controls Group -->
@@ -179,8 +184,11 @@
         let simulation, svg, g, link, node, zoom;
         let globalData = { nodes: [], links: [] };
 
-        // URL to the GitHub  CSV
-        const remoteCSVUrl = './data/CSV_en.csv';
+        // Prioritized list of sources to load data
+        const csvSources = [
+            './data/CSV_en.csv', // 1. Try Relative path (Best for GitHub Pages structure)
+            'https://raw.githubusercontent.com/stop6G/6G-SCOUT/main/data/CSV_en.csv' // 2. Try Absolute path (Best for Local/Canvas)
+        ];
 
         // Sample Data Fallback
         const sampleCSV = `Acrónimo;Coordinador;Partners;Dinero Recibido (€);Descripción;Año
@@ -193,6 +201,7 @@ XTRUST-6G;Centre for Research;Ericsson, Nokia, Telefónica;7998595;Trust and sec
         // Utility: Short money format (e.g., 5.9M€)
         const formatMoneyShort = (value) => {
             if (!value) return '';
+            if (value >= 1000000000) return (value / 1000000000).toFixed(1) + 'B€'; // Billions
             if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M€';
             if (value >= 1000) return (value / 1000).toFixed(0) + 'k€';
             return value + '€';
@@ -347,9 +356,18 @@ XTRUST-6G;Centre for Research;Ericsson, Nokia, Telefónica;7998595;Trust and sec
                 .map(n => `<option value="${n.id}">${n.type === 'project' ? 'Project' : (n.type === 'coordinator' ? 'Coordinator' : 'Partner')}</option>`)
                 .join('');
 
+            // --- Stats Updates ---
             document.getElementById('count-projects').innerText = data.nodes.filter(n => n.type === 'project').length;
             document.getElementById('count-coordinators').innerText = data.nodes.filter(n => n.type === 'coordinator').length;
             document.getElementById('count-partners').innerText = data.nodes.filter(n => n.type === 'partner').length;
+            
+            // --- NEW: Calculate Total Investment ---
+            const totalMoney = data.nodes
+                .filter(n => n.type === 'project')
+                .reduce((sum, n) => sum + (n.money || 0), 0);
+            
+            // Update the header display
+            document.getElementById('header-total-investment').innerText = formatMoneyShort(totalMoney);
 
             link = g.selectAll(".link")
                 .data(data.links)
@@ -629,17 +647,34 @@ XTRUST-6G;Centre for Research;Ericsson, Nokia, Telefónica;7998595;Trust and sec
         async function loadInitialData() {
             initGraph(); // Clear first
             
-            try {
-                const response = await fetch(remoteCSVUrl);
-                if (!response.ok) throw new Error('Network response was not ok');
-                const text = await response.text();
-                const graphData = parseCSVAndBuildGraph(text);
-                updateGraph(graphData);
-            } catch (error) {
-                console.warn('Could not load remote CSV, falling back to sample data:', error);
-                const graphData = parseCSVAndBuildGraph(sampleCSV);
-                updateGraph(graphData);
+            // Iterate through the list of candidates
+            for (const url of csvSources) {
+                try {
+                    console.log(`Attempting to load data from: ${url}`);
+                    const response = await fetch(url);
+                    
+                    if (response.ok) {
+                        const text = await response.text();
+                        
+                        // Basic check: Ensure it's not an HTML 404 page
+                        // (GitHub Pages 404s often return HTML with 404 status, but simple servers might just return index.html)
+                        if (text.trim().startsWith('<')) {
+                             throw new Error('Response appears to be HTML (likely 404 page)');
+                        }
+
+                        const graphData = parseCSVAndBuildGraph(text);
+                        updateGraph(graphData);
+                        return; // Exit on success
+                    }
+                } catch (error) {
+                    console.warn(`Failed to load from ${url}:`, error);
+                }
             }
+
+            // Fallback: If all candidates fail, load sample data
+            console.warn('All remote sources failed. Falling back to sample data.');
+            const graphData = parseCSVAndBuildGraph(sampleCSV);
+            updateGraph(graphData);
         }
 
         // Start with remote load
